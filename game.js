@@ -26,18 +26,57 @@ let ties = 0;
 /***************************** HELPER FUNCTIONS ******************************/
 function printHelp() {
   // Your code here
+  const helpMessage = ["  Type 'r' for Rock",
+    "  Type 'p' for Paper",
+    "  Type 's' for Scissors",
+    "  Type 'q' to quit",
+    "  Type 'h' for a list of valid commands\n"]
+  return helpMessage.forEach(msg => {
+    console.log(msg);
+  })
 }
 
 function getWinner(move1, move2) {
   // Your code here
+  move1 = move1.toLowerCase();
+  //check if both moves are equals
+  if (move1 === move2) return 0
+  //check if the entered values is beatable with AI.
+  if (VALID_MOVES[move1].winsAgainst === move2) {
+
+    return 1;
+  }
+
+  return -1;
+
 }
 
 function getCPUMove() {
   // Your code here
+  //get the possible moves from the valid moves
+  const validMoveKeys = Object.keys(VALID_MOVES);
+  //get random numbers that matches from number of possible moves
+  const randomIndex = Math.floor(Math.random() * validMoveKeys.length);
+  //get key for the generetated number.
+  const cpu = validMoveKeys[randomIndex];
+  return cpu;
 }
 
 function processMove(cmd, cpu) {
   // Your code here
+  console.log(`You pick ${cmd}, computer picks ${cpu}.`);
+  if (cmd === cpu) { // tie
+    console.log("You tie.\n");
+    ties++;
+  }
+  else if (VALID_MOVES[cmd].winsAgainst === cpu) { // win
+    console.log("You win!\n");
+    wins++;
+  } else { // loss
+    console.log("You lose...\n");
+    losses++;
+  }
+
 }
 
 /******************************* MAIN FUNCTION *******************************/
@@ -45,44 +84,20 @@ function promptInput(rl) {
   console.log(`${wins} wins - ${losses} losses - ${ties} ties`);
   rl.question('> ', (cmd) => {
     cmd = cmd.toLowerCase();
-
     if (cmd === 'h') {
-      console.log("\nHelp:\n");
-      console.log("  Type 'r' for Rock");
-      console.log("  Type 'p' for Paper");
-      console.log("  Type 's' for Scissors");
-      console.log("  Type 'q' to quit");
-      console.log("  Type 'h' for a list of valid commands\n");
+      //print the game guideline
+      printHelp();
     } else if (cmd === 'q') {
       rl.close();
       return;
-    } else if (VALID_MOVES[cmd]){
-      const validMoveKeys = Object.keys(VALID_MOVES);
-      const randomIndex = Math.floor(Math.random() * validMoveKeys.length);
-      const cpu = validMoveKeys[randomIndex];
-
+    } else if (VALID_MOVES[cmd]) {
+      const cpu = getCPUMove();
       console.log(`You pick ${cmd}, computer picks ${cpu}.`);
-
-      if (cmd === cpu) { // tie
-        console.log("You tie.\n");
-        ties++;
-      }
-      else if (VALID_MOVES[cmd].winsAgainst === cpu) { // win
-        console.log("You win!\n");
-        wins++;
-      } else { // loss
-        console.log("You lose...\n");
-        losses++;
-      }
-    } else {
-      console.log("\nInvalid command.\n");
-      console.log("  Type 'r' for Rock");
-      console.log("  Type 'p' for Paper");
-      console.log("  Type 's' for Scissors");
-      console.log("  Type 'q' to quit");
-      console.log("  Type 'h' for a list of valid commands\n");
+      processMove(cmd, cpu);
     }
-
+    else {
+      console.log("\nInvalid command.\n")
+    }
     promptInput(rl);
   });
 }
@@ -93,12 +108,7 @@ function initializeGame() {
     input: process.stdin,
     output: process.stdout
   });
-  console.log("Welcome to Rock/Paper/Scissors\n");
-  console.log("  Type 'r' for Rock");
-  console.log("  Type 'p' for Paper");
-  console.log("  Type 's' for Scissors");
-  console.log("  Type 'q' to quit");
-  console.log("  Type 'h' for a list of valid commands\n");
+  printHelp();
 
   promptInput(rl);
 }
